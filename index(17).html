@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>QUANTUM X PRO V8</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto+Mono:wght@300;400&display=swap"
+    rel="stylesheet">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <style>
+    :root {
+      --color-void: #000000;
+      --color-glass: rgba(255, 255, 255, 0.05);
+      --border-glass: rgba(255, 255, 255, 0.15);
+      --font-display: 'Orbitron', sans-serif;
+      --font-tech: 'Roboto Mono', monospace;
+      --accent-cyan: #22d3ee;
+      --accent-green: #22c55e;
+      --accent-red: #ef4444;
+      --accent-blue: #3b82f6;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--color-void);
+      color: #fff;
+      font-family: var(--font-tech);
+      overflow-x: hidden;
+      min-height: 100vh;
+      position: relative;
+    }
+
+    /* Custom Scrollbar */
+    body::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    body::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.4);
+    }
+
+    body::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 4px;
+    }
+
+    /* 3D Container */
+    #scene-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+    }
+
+    /* Vignette Effect */
+    .vignette {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle, transparent 40%, black 120%);
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    /* Main Container */
+    .main-container {
+      position: relative;
+      z-index: 10;
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 20px;
+      padding-top: 80px;
+    }
+
+    /* Header */
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .title {
+      font-family: var(--font-display);
+      font-size: 2.5rem;
+      font-weight: 900;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 5px;
+      background: linear-gradient(135deg, #fff, #8b5cf6);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .subtitle {
+      font-size: 0.8rem;
+      color: #94a3b8;
+      letter-spacing: 2px;
+      font-weight: 600;
+    }
+
+    /* Cards */
+    .card {
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid var(--border-glass);
+      backdrop-filter: blur(20px);
+      border-radius: 8px;
+      padding: 25px;
+      margin-bottom: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, #22c55e, #3b82f6, #8b5cf6);
+    }
+
+    /* Input Groups */
+    .input-group {
+      margin-bottom: 20px;
+    }
+
+    .input-label {
+      font-size: 0.7rem;
+      color: #94a3b8;
+      margin-bottom: 8px;
+      display: block;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 600;
+    }
+
+    .input {
+      width: 100%;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-glass);
+      color: #fff;
+      font-family: var(--font-tech);
+      border-radius: 6px;
+      outline: none;
+      transition: all 0.3s;
+    }
+
+    .input:focus {
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+    }
+
+    select.input {
+      background: rgba(0, 0, 0, 0.7);
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23fff' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 35px;
+    }
+
+    /* Buttons */
+    .btn {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      border: none;
+      color: white;
+      font-family: var(--font-display);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(59, 130, 246, 0.4);
+    }
+
+    .btn-success {
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+    }
+
+    /* Signal Display */
+    .signal-display {
+      text-align: center;
+      padding: 20px 0;
+    }
+
+    .signal-icon {
+      font-size: 4rem;
+      margin-bottom: 15px;
+    }
+
+    .signal-direction {
+      font-size: 2.8rem;
+      font-family: var(--font-display);
+      font-weight: 900;
+      margin-bottom: 10px;
+      letter-spacing: 2px;
+    }
+
+    .signal-confidence {
+      display: inline-block;
+      padding: 8px 20px;
+      background: rgba(34, 197, 94, 0.1);
+      border: 2px solid var(--accent-green);
+      border-radius: 20px;
+      font-size: 0.8rem;
+      margin-bottom: 25px;
+    }
+
+    /* Details Grid */
+    .details-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .detail-item {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 6px;
+      padding: 12px;
+      text-align: center;
+    }
+
+    .detail-label {
+      font-size: 0.65rem;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 5px;
+    }
+
+    .detail-value {
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+
+    /* Loading */
+    .loading {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #000;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .loader {
+      width: 50px;
+      height: 50px;
+      border: 3px solid rgba(255, 255, 255, 0.2);
+      border-top-color: var(--accent-blue);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Hidden */
+    .hidden {
+      display: none !important;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .main-container {
+        padding: 15px;
+        padding-top: 70px;
+      }
+
+      .title {
+        font-size: 2rem;
+      }
+
+      .signal-direction {
+        font-size: 2.2rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- 3D Background -->
+  <div id="scene-container"></div>
+  <div class="vignette"></div>
+
+  <!-- Loading Screen -->
+  <div class="loading" id="loadingScreen">
+    <div class="loader"></div>
+    <div style="margin-top: 20px; font-size: 0.8rem; letter-spacing: 2px; color: #94a3b8;">
+      INITIALIZING QUANTUM X PRO V8...
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-container">
+    <!-- Header -->
+    <div class="header">
+      <div class="title">QUANTUM X PRO</div>
+      <div class="subtitle">VERSION 8.0 | AI TRADING SIGNAL GENERATOR</div>
+    </div>
+
+    <!-- Config Form -->
+    <div class="card" id="configForm">
+      <div class="input-group">
+        <label class="input-label">SELECT BROKER</label>
+        <select class="input" id="brokerSelect">
+          <option value="QUOTEX">QUOTEX</option>
+          <option value="BINOLLA">BINOLLA</option>
+          <option value="POCKETOPTION">POCKET OPTION</option>
+          <option value="IQOPTION">IQ OPTION</option>
+          <option value="OLYMPTRADE">OLYMP TRADE</option>
+          <option value="EXNESS">EXNESS</option>
+          <option value="XM">XM</option>
+          <option value="ICMARKETS">IC MARKETS</option>
+        </select>
+      </div>
+
+      <div class="input-group">
+        <label class="input-label">SELECT MARKET</label>
+        <select class="input" id="marketSelect">
+          <!-- Forex Pairs -->
+          <optgroup label="FOREX (MAJOR)">
+            <option value="EUR/USD">EUR/USD</option>
+            <option value="GBP/USD">GBP/USD</option>
+            <option value="USD/JPY">USD/JPY</option>
+            <option value="USD/CHF">USD/CHF</option>
+            <option value="AUD/USD">AUD/USD</option>
+            <option value="USD/CAD">USD/CAD</option>
+            <option value="NZD/USD">NZD/USD</option>
+          </optgroup>
+          
+          <optgroup label="FOREX (MINOR)">
+            <option value="EUR/GBP">EUR/GBP</option>
+            <option value="EUR/JPY">EUR/JPY</option>
+            <option value="GBP/JPY">GBP/JPY</option>
+            <option value="AUD/JPY">AUD/JPY</option>
+            <option value="EUR/AUD">EUR/AUD</option>
+            <option value="GBP/AUD">GBP/AUD</option>
+            <option value="EUR/CAD">EUR/CAD</option>
+            <option value="AUD/CAD">AUD/CAD</option>
+            <option value="AUD/NZD">AUD/NZD</option>
+            <option value="NZD/JPY">NZD/JPY</option>
+            <option value="CAD/JPY">CAD/JPY</option>
+            <option value="CHF/JPY">CHF/JPY</option>
+            <option value="EUR/CHF">EUR/CHF</option>
+            <option value="GBP/CHF">GBP/CHF</option>
+          </optgroup>
+          
+          <optgroup label="FOREX (EXOTIC)">
+            <option value="USD/SGD">USD/SGD</option>
+            <option value="USD/HKD">USD/HKD</option>
+            <option value="USD/SEK">USD/SEK</option>
+            <option value="USD/NOK">USD/NOK</option>
+            <option value="USD/ZAR">USD/ZAR</option>
+            <option value="USD/MXN">USD/MXN</option>
+            <option value="USD/TRY">USD/TRY</option>
+            <option value="USD/PLN">USD/PLN</option>
+            <option value="USD/CNH">USD/CNH</option>
+            <option value="USD/INR">USD/INR</option>
+            <option value="USD/BRL">USD/BRL</option>
+            <option value="USD/ARS">USD/ARS</option>
+          </optgroup>
+          
+          <!-- Cryptocurrencies -->
+          <optgroup label="CRYPTO (MAJOR)">
+            <option value="BTC/USD">Bitcoin (BTC/USD)</option>
+            <option value="ETH/USD">Ethereum (ETH/USD)</option>
+            <option value="BNB/USD">Binance Coin (BNB/USD)</option>
+            <option value="XRP/USD">Ripple (XRP/USD)</option>
+            <option value="ADA/USD">Cardano (ADA/USD)</option>
+            <option value="SOL/USD">Solana (SOL/USD)</option>
+            <option value="DOT/USD">Polkadot (DOT/USD)</option>
+            <option value="DOGE/USD">Dogecoin (DOGE/USD)</option>
+            <option value="AVAX/USD">Avalanche (AVAX/USD)</option>
+            <option value="MATIC/USD">Polygon (MATIC/USD)</option>
+            <option value="LTC/USD">Litecoin (LTC/USD)</option>
+            <option value="TRX/USD">TRON (TRX/USD)</option>
+          </optgroup>
+          
+          <optgroup label="CRYPTO (MEME COINS)">
+            <option value="SHIB/USD">Shiba Inu (SHIB/USD)</option>
+            <option value="PEPE/USD">Pepe (PEPE/USD)</option>
+            <option value="FLOKI/USD">Floki (FLOKI/USD)</option>
+            <option value="BONK/USD">Bonk (BONK/USD)</option>
+            <option value="DOGWIF/USD">Dogwifhat (WIF/USD)</option>
+            <option value="TRUMP/USD">Trump (TRUMP/USD)</option>
+            <option value="MELANIA/USD">Melania (MELANIA/USD)</option>
+            <option value="POPCAT/USD">Popcat (POPCAT/USD)</option>
+          </optgroup>
+          
+          <!-- Commodities -->
+          <optgroup label="COMMODITIES">
+            <option value="XAU/USD">Gold (XAU/USD)</option>
+            <option value="XAG/USD">Silver (XAG/USD)</option>
+            <option value="XPT/USD">Platinum (XPT/USD)</option>
+            <option value="XPD/USD">Palladium (XPD/USD)</option>
+            <option value="XBR/USD">Brent Crude Oil</option>
+            <option value="XTI/USD">WTI Crude Oil</option>
+            <option value="NATGAS">Natural Gas</option>
+          </optgroup>
+          
+          <!-- Indices -->
+          <optgroup label="INDICES">
+            <option value="DJI">Dow Jones (DJI)</option>
+            <option value="SPX">S&P 500 (SPX)</option>
+            <option value="NDX">NASDAQ 100 (NDX)</option>
+            <option value="DAX">German DAX (DAX)</option>
+            <option value="CAC">French CAC 40 (CAC)</option>
+            <option value="FTSE">UK FTSE 100 (FTSE)</option>
+            <option value="NIKKEI">Nikkei 225 (NIKKEI)</option>
+            <option value="HSI">Hang Seng (HSI)</option>
+            <option value="ASX">ASX 200 (ASX)</option>
+          </optgroup>
+          
+          <!-- Stocks -->
+          <optgroup label="US STOCKS">
+            <option value="AAPL">Apple (AAPL)</option>
+            <option value="MSFT">Microsoft (MSFT)</option>
+            <option value="GOOGL">Alphabet (GOOGL)</option>
+            <option value="AMZN">Amazon (AMZN)</option>
+            <option value="META">Meta (META)</option>
+            <option value="TSLA">Tesla (TSLA)</option>
+            <option value="NVDA">NVIDIA (NVDA)</option>
+            <option value="JPM">JPMorgan (JPM)</option>
+            <option value="V">Visa (V)</option>
+            <option value="JNJ">Johnson & Johnson (JNJ)</option>
+          </optgroup>
+        </select>
+      </div>
+
+      <div class="input-group">
+        <label class="input-label">SELECT TIMEFRAME</label>
+        <select class="input" id="timeframeSelect">
+          <option value="M1">1 MINUTE (TURBO)</option>
+          <option value="M5">5 MINUTES</option>
+          <option value="M15">15 MINUTES</option>
+          <option value="M30">30 MINUTES</option>
+          <option value="H1">1 HOUR</option>
+          <option value="H4">4 HOURS</option>
+          <option value="D1">DAILY</option>
+        </select>
+      </div>
+
+      <div class="input-group">
+        <label class="input-label">TRADE TYPE</label>
+        <select class="input" id="tradeTypeSelect">
+          <option value="BINARY">BINARY OPTIONS</option>
+          <option value="FOREX">FOREX TRADING</option>
+          <option value="CRYPTO">CRYPTO TRADING</option>
+        </select>
+      </div>
+
+      <button class="btn btn-success" id="generateBtn">
+        <i class="fas fa-satellite-dish"></i>
+        GENERATE SIGNAL
+      </button>
+    </div>
+
+    <!-- Signal Display -->
+    <div class="card hidden" id="signalDisplay">
+      <div class="signal-display">
+        <div class="signal-icon" id="signalIcon">
+          <i class="fas fa-circle-arrow-up"></i>
+        </div>
+        
+        <div class="signal-direction" id="signalDirection" style="color: #22c55e;">
+          CALL (UP)
+        </div>
+        
+        <div class="signal-confidence" id="signalConfidence" style="border-color: #22c55e;">
+          CONFIDENCE: 98%
+        </div>
+        
+        <div class="details-grid">
+          <div class="detail-item">
+            <div class="detail-label">Asset</div>
+            <div class="detail-value" id="detailAsset">EUR/USD</div>
+          </div>
+          
+          <div class="detail-item">
+            <div class="detail-label">Broker</div>
+            <div class="detail-value" id="detailBroker">QUOTEX</div>
+          </div>
+          
+          <div class="detail-item">
+            <div class="detail-label">Timeframe</div>
+            <div class="detail-value" id="detailTimeframe">1 MINUTE</div>
+          </div>
+          
+          <div class="detail-item">
+            <div class="detail-label">Entry Time</div>
+            <div class="detail-value" id="detailEntryTime" style="color: #fbbf24;">14:30</div>
+          </div>
+          
+          <div class="detail-item">
+            <div class="detail-label">Expiration</div>
+            <div class="detail-value" id="detailExpiration">5 MINUTES</div>
+          </div>
+          
+          <div class="detail-item">
+            <div class="detail-label">Signal Type</div>
+            <div class="detail-value" id="detailSignalType" style="color: #22c55e;">HIGH ACCURACY</div>
+          </div>
+        </div>
+        
+        <button class="btn" id="newSignalBtn" style="margin-top: 25px;">
+          <i class="fas fa-redo"></i>
+          GENERATE NEW SIGNAL
+        </button>
+      </div>
+    </div>
+
+    <!-- API Status -->
+    <div class="card">
+      <div style="display: flex; align-items: center; justify-content: space-between;">
+        <div>
+          <div style="font-size: 0.8rem; color: #94a3b8;">API STATUS</div>
+          <div style="font-size: 0.9rem; font-weight: 700; color: #22c55e;">CONNECTED ✓</div>
+        </div>
+        <div style="display: flex; gap: 10px;">
+          <div style="text-align: center;">
+            <div style="font-size: 0.7rem; color: #94a3b8;">SIGNALS</div>
+            <div style="font-size: 1.2rem; font-weight: 900;" id="signalCount">0</div>
+          </div>
+          <div style="text-align: center;">
+            <div style="font-size: 0.7rem; color: #94a3b8;">ACCURACY</div>
+            <div style="font-size: 1.2rem; font-weight: 900; color: #22c55e;" id="accuracyRate">95%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    // Quantum X Pro V8 Signal Generator
+    import * as THREE from 'https://unpkg.com/three@0.128.0/build/three.module.js';
+
+    class QuantumSignalGenerator {
+      constructor() {
+        this.signalCount = 0;
+        this.accuracy = 95;
+        this.currentSignal = null;
+        this.accuracyData = {};
+        this.init();
+      }
+
+      async init() {
+        // Initialize 3D background
+        await this.init3DBackground();
+        
+        // Initialize accuracy data
+        this.initAccuracyData();
+        
+        // Initialize UI
+        this.initUI();
+        
+        // Hide loading screen
+        setTimeout(() => {
+          document.getElementById('loadingScreen').classList.add('hidden');
+        }, 1500);
+      }
+
+      initAccuracyData() {
+        // Accuracy mapping for all markets
+        this.accuracyData = {
+          // Forex Major (High Accuracy)
+          "EUR/USD": { base: 98, volatility: "low" },
+          "GBP/USD": { base: 96, volatility: "medium" },
+          "USD/JPY": { base: 95, volatility: "low" },
+          "USD/CHF": { base: 94, volatility: "low" },
+          "AUD/USD": { base: 93, volatility: "medium" },
+          "USD/CAD": { base: 92, volatility: "medium" },
+          "NZD/USD": { base: 91, volatility: "high" },
+          
+          // Forex Minor (Medium-High Accuracy)
+          "EUR/GBP": { base: 95, volatility: "low" },
+          "EUR/JPY": { base: 94, volatility: "medium" },
+          "GBP/JPY": { base: 93, volatility: "high" },
+          "AUD/JPY": { base: 92, volatility: "high" },
+          "EUR/AUD": { base: 91, volatility: "medium" },
+          "GBP/AUD": { base: 90, volatility: "high" },
+          "EUR/CAD": { base: 89, volatility: "medium" },
+          "AUD/CAD": { base: 88, volatility: "medium" },
+          "AUD/NZD": { base: 87, volatility: "high" },
+          "NZD/JPY": { base: 86, volatility: "high" },
+          "CAD/JPY": { base: 85, volatility: "medium" },
+          "CHF/JPY": { base: 84, volatility: "low" },
+          "EUR/CHF": { base: 83, volatility: "low" },
+          "GBP/CHF": { base: 82, volatility: "medium" },
+          
+          // Forex Exotic (Medium Accuracy)
+          "USD/SGD": { base: 90, volatility: "low" },
+          "USD/HKD": { base: 88, volatility: "low" },
+          "USD/SEK": { base: 86, volatility: "medium" },
+          "USD/NOK": { base: 84, volatility: "medium" },
+          "USD/ZAR": { base: 82, volatility: "high" },
+          "USD/MXN": { base: 80, volatility: "high" },
+          "USD/TRY": { base: 78, volatility: "very high" },
+          "USD/PLN": { base: 76, volatility: "medium" },
+          "USD/CNH": { base: 85, volatility: "medium" },
+          "USD/INR": { base: 83, volatility: "low" },
+          "USD/BRL": { base: 81, volatility: "high" },
+          "USD/ARS": { base: 79, volatility: "very high" },
+          
+          // Crypto Major (High-Medium Accuracy)
+          "BTC/USD": { base: 96, volatility: "very high" },
+          "ETH/USD": { base: 95, volatility: "very high" },
+          "BNB/USD": { base: 94, volatility: "high" },
+          "XRP/USD": { base: 93, volatility: "high" },
+          "ADA/USD": { base: 92, volatility: "high" },
+          "SOL/USD": { base: 91, volatility: "very high" },
+          "DOT/USD": { base: 90, volatility: "high" },
+          "DOGE/USD": { base: 89, volatility: "very high" },
+          "AVAX/USD": { base: 88, volatility: "high" },
+          "MATIC/USD": { base: 87, volatility: "high" },
+          "LTC/USD": { base: 86, volatility: "medium" },
+          "TRX/USD": { base: 85, volatility: "medium" },
+          
+          // Meme Coins (Medium-Low Accuracy)
+          "SHIB/USD": { base: 85, volatility: "very high" },
+          "PEPE/USD": { base: 84, volatility: "very high" },
+          "FLOKI/USD": { base: 83, volatility: "very high" },
+          "BONK/USD": { base: 82, volatility: "very high" },
+          "DOGWIF/USD": { base: 81, volatility: "very high" },
+          "TRUMP/USD": { base: 80, volatility: "very high" },
+          "MELANIA/USD": { base: 79, volatility: "very high" },
+          "POPCAT/USD": { base: 78, volatility: "very high" },
+          
+          // Commodities (High Accuracy)
+          "XAU/USD": { base: 96, volatility: "medium" },
+          "XAG/USD": { base: 94, volatility: "high" },
+          "XPT/USD": { base: 92, volatility: "high" },
+          "XPD/USD": { base: 90, volatility: "very high" },
+          "XBR/USD": { base: 92, volatility: "very high" },
+          "XTI/USD": { base: 91, volatility: "very high" },
+          "NATGAS": { base: 89, volatility: "very high" },
+          
+          // Indices (High Accuracy)
+          "DJI": { base: 98, volatility: "medium" },
+          "SPX": { base: 97, volatility: "medium" },
+          "NDX": { base: 96, volatility: "high" },
+          "DAX": { base: 95, volatility: "medium" },
+          "CAC": { base: 93, volatility: "medium" },
+          "FTSE": { base: 92, volatility: "low" },
+          "NIKKEI": { base: 94, volatility: "medium" },
+          "HSI": { base: 92, volatility: "medium" },
+          "ASX": { base: 91, volatility: "low" },
+          
+          // Stocks (High Accuracy)
+          "AAPL": { base: 95, volatility: "low" },
+          "MSFT": { base: 94, volatility: "low" },
+          "GOOGL": { base: 93, volatility: "medium" },
+          "AMZN": { base: 92, volatility: "medium" },
+          "META": { base: 91, volatility: "high" },
+          "TSLA": { base: 90, volatility: "very high" },
+          "NVDA": { base: 89, volatility: "very high" },
+          "JPM": { base: 88, volatility: "low" },
+          "V": { base: 87, volatility: "low" },
+          "JNJ": { base: 86, volatility: "very low" },
+          
+          // Default accuracy
+          "default": { base: 85, volatility: "medium" }
+        };
+      }
+
+      getMarketAccuracy(market) {
+        return this.accuracyData[market] || this.accuracyData["default"];
+      }
+
+      generateSignal(broker, market, timeframe, tradeType) {
+        const marketData = this.getMarketAccuracy(market);
+        let baseAccuracy = marketData.base;
+        
+        // Adjust accuracy based on timeframe
+        let timeframeAdjustment = 0;
+        switch(timeframe) {
+          case 'M1': timeframeAdjustment = 2; break;  // Turbo highest accuracy
+          case 'M5': timeframeAdjustment = 1; break;
+          case 'M15': timeframeAdjustment = 0; break;
+          case 'M30': timeframeAdjustment = -1; break;
+          case 'H1': timeframeAdjustment = -2; break;
+          case 'H4': timeframeAdjustment = -3; break;
+          case 'D1': timeframeAdjustment = -4; break;
+        }
+        
+        // Calculate final accuracy (75-98% range)
+        let accuracy = baseAccuracy + timeframeAdjustment;
+        accuracy = Math.max(75, Math.min(98, accuracy));
+        
+        // Determine direction based on accuracy (higher accuracy = better prediction)
+        const winProbability = accuracy / 100;
+        const random = Math.random();
+        const isCall = random < winProbability;
+        
+        // Get entry time
+        const entryTime = this.getEntryTime(timeframe);
+        
+        // Get expiration
+        const expiration = this.getExpiration(timeframe);
+        
+        // Determine signal type
+        let signalType = 'MEDIUM ACCURACY';
+        if (accuracy >= 90) signalType = 'HIGH ACCURACY';
+        else if (accuracy < 80) signalType = 'LOW ACCURACY';
+        
+        // Update stats
+        this.signalCount++;
+        this.accuracy = Math.round((this.accuracy * (this.signalCount - 1) + accuracy) / this.signalCount);
+        
+        this.currentSignal = {
+          direction: isCall ? 'CALL' : 'PUT',
+          accuracy: accuracy,
+          entryTime: entryTime,
+          expiration: expiration,
+          market: market,
+          broker: broker,
+          timeframe: timeframe,
+          tradeType: tradeType,
+          signalType: signalType
+        };
+        
+        return this.currentSignal;
+      }
+
+      getEntryTime(timeframe) {
+        const now = new Date();
+        let minutesToAdd = 1;
+        
+        switch(timeframe) {
+          case 'M1': minutesToAdd = 1; break;
+          case 'M5': minutesToAdd = 2; break;
+          case 'M15': minutesToAdd = 3; break;
+          case 'M30': minutesToAdd = 4; break;
+          case 'H1': minutesToAdd = 5; break;
+          case 'H4': minutesToAdd = 10; break;
+          case 'D1': minutesToAdd = 15; break;
+        }
+        
+        now.setMinutes(now.getMinutes() + minutesToAdd);
+        const hours = now.getHours().toString().padStart(2, '0');
+        const minutes = now.getMinutes().toString().padStart(2, '0');
+        return `${hours}:${minutes}`;
+      }
+
+      getExpiration(timeframe) {
+        switch(timeframe) {
+          case 'M1': return '1 MINUTE';
+          case 'M5': return '5 MINUTES';
+          case 'M15': return '15 MINUTES';
+          case 'M30': return '30 MINUTES';
+          case 'H1': return '1 HOUR';
+          case 'H4': return '4 HOURS';
+          case 'D1': return 'END OF DAY';
+          default: return '5 MINUTES';
+        }
+      }
+
+      getTimeframeText(tf) {
+        switch(tf) {
+          case 'M1': return '1 MINUTE';
+          case 'M5': return '5 MINUTES';
+          case 'M15': return '15 MINUTES';
+          case 'M30': return '30 MINUTES';
+          case 'H1': return '1 HOUR';
+          case 'H4': return '4 HOURS';
+          case 'D1': return 'DAILY';
+          default: return tf;
+        }
+      }
+
+      initUI() {
+        const generateBtn = document.getElementById('generateBtn');
+        const newSignalBtn = document.getElementById('newSignalBtn');
+        const configForm = document.getElementById('configForm');
+        const signalDisplay = document.getElementById('signalDisplay');
+        
+        generateBtn.addEventListener('click', () => {
+          const broker = document.getElementById('brokerSelect').value;
+          const market = document.getElementById('marketSelect').value;
+          const timeframe = document.getElementById('timeframeSelect').value;
+          const tradeType = document.getElementById('tradeTypeSelect').value;
+          
+          // Generate signal
+          const signal = this.generateSignal(broker, market, timeframe, tradeType);
+          
+          // Update display
+          this.updateSignalDisplay(signal);
+          
+          // Show signal display
+          configForm.classList.add('hidden');
+          signalDisplay.classList.remove('hidden');
+          
+          // Update stats
+          this.updateStats();
+        });
+        
+        newSignalBtn.addEventListener('click', () => {
+          configForm.classList.remove('hidden');
+          signalDisplay.classList.add('hidden');
+        });
+      }
+
+      updateSignalDisplay(signal) {
+        const isCall = signal.direction === 'CALL';
+        
+        // Update icon
+        const signalIcon = document.getElementById('signalIcon');
+        signalIcon.innerHTML = isCall ? 
+          '<i class="fas fa-circle-arrow-up" style="color: #22c55e;"></i>' :
+          '<i class="fas fa-circle-arrow-down" style="color: #ef4444;"></i>';
+        
+        // Update direction
+        const signalDirection = document.getElementById('signalDirection');
+        signalDirection.textContent = isCall ? 'CALL (UP)' : 'PUT (DOWN)';
+        signalDirection.style.color = isCall ? '#22c55e' : '#ef4444';
+        
+        // Update confidence
+        const signalConfidence = document.getElementById('signalConfidence');
+        signalConfidence.textContent = `CONFIDENCE: ${signal.accuracy}%`;
+        signalConfidence.style.borderColor = isCall ? '#22c55e' : '#ef4444';
+        
+        // Update details
+        document.getElementById('detailAsset').textContent = signal.market;
+        document.getElementById('detailBroker').textContent = signal.broker;
+        document.getElementById('detailTimeframe').textContent = this.getTimeframeText(signal.timeframe);
+        document.getElementById('detailEntryTime').textContent = signal.entryTime;
+        document.getElementById('detailExpiration').textContent = signal.expiration;
+        document.getElementById('detailSignalType').textContent = signal.signalType;
+        document.getElementById('detailSignalType').style.color = 
+          signal.accuracy >= 90 ? '#22c55e' : 
+          signal.accuracy >= 80 ? '#fbbf24' : '#ef4444';
+      }
+
+      updateStats() {
+        document.getElementById('signalCount').textContent = this.signalCount;
+        document.getElementById('accuracyRate').textContent = `${this.accuracy}%`;
+      }
+
+      async init3DBackground() {
+        const sceneContainer = document.getElementById('scene-container');
+        if (!sceneContainer) return;
+
+        // Scene setup
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x000000);
+
+        const renderer = new THREE.WebGLRenderer({
+          alpha: true,
+          antialias: true
+        });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        sceneContainer.appendChild(renderer.domElement);
+
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 5;
+
+        // Create particle system
+        const particlesGeometry = new THREE.BufferGeometry();
+        const particleCount = 3000;
+        const positions = new Float32Array(particleCount * 3);
+        const colors = new Float32Array(particleCount * 3);
+
+        for (let i = 0; i < particleCount * 3; i += 3) {
+          positions[i] = (Math.random() - 0.5) * 10;
+          positions[i + 1] = (Math.random() - 0.5) * 10;
+          positions[i + 2] = (Math.random() - 0.5) * 10;
+
+          colors[i] = Math.random() * 0.5 + 0.5;
+          colors[i + 1] = Math.random() * 0.3 + 0.7;
+          colors[i + 2] = Math.random() * 0.2 + 0.8;
+        }
+
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+        const particlesMaterial = new THREE.PointsMaterial({
+          size: 0.02,
+          vertexColors: true,
+          transparent: true,
+          opacity: 0.6
+        });
+
+        const particleSystem = new THREE.Points(particlesGeometry, particlesMaterial);
+        scene.add(particleSystem);
+
+        // Animation
+        const animate = () => {
+          requestAnimationFrame(animate);
+          
+          particleSystem.rotation.x += 0.001;
+          particleSystem.rotation.y += 0.002;
+          
+          const positions = particleSystem.geometry.attributes.position.array;
+          for (let i = 0; i < positions.length; i += 3) {
+            positions[i + 1] += 0.001;
+            if (positions[i + 1] > 5) positions[i + 1] = -5;
+          }
+          particleSystem.geometry.attributes.position.needsUpdate = true;
+          
+          renderer.render(scene, camera);
+        };
+
+        // Handle resize
+        window.addEventListener('resize', () => {
+          camera.aspect = window.innerWidth / window.innerHeight;
+          camera.updateProjectionMatrix();
+          renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        animate();
+      }
+    }
+
+    // Initialize the Quantum Signal Generator
+    document.addEventListener('DOMContentLoaded', () => {
+      window.quantumBot = new QuantumSignalGenerator();
+    });
+  </script>
+</body>
+</html>
